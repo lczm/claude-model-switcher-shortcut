@@ -1,5 +1,6 @@
 // ==UserScript==
 // @name         Claude model switcher shortcut
+// @namespace    Violentmonkey Scripts
 // @version      1.0.0
 // @description  Ctrl+1..9 selects the Nth item in Claude's model switcher menu.
 // @license      MIT
