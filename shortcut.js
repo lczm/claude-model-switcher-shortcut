@@ -13,10 +13,13 @@
   "use strict";
 
   const MENU_OPEN_DELAY_MS = 80;
+  const REFOCUS_DELAY_MS = 60;
   const SEL = {
     modelSwitcherButton: 'button[data-testid="model-selector-dropdown"]',
     menuItem:
       '[role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"]',
+    chatInput:
+      '[data-testid="chat-input"], [contenteditable="true"][role="textbox"]',
   };
 
   function notify(text) {
@@ -49,6 +52,20 @@
     });
   }
 
+  function focusChatInput() {
+    const input = document.querySelector(SEL.chatInput);
+    if (!input) return;
+    input.focus();
+    try {
+      const range = document.createRange();
+      range.selectNodeContents(input);
+      range.collapse(false);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } catch (_) {}
+  }
+
   function switchModel(n) {
     const idx = n - 1;
     const btn = document.querySelector(SEL.modelSwitcherButton);
@@ -69,6 +86,7 @@
           new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
         );
         notify(`No model #${n} (only ${items.length} available)`);
+        setTimeout(focusChatInput, REFOCUS_DELAY_MS);
         return;
       }
       const target = items[idx];
@@ -76,6 +94,7 @@
         (target.textContent || "").trim().split("\n")[0].slice(0, 60) ||
         `Model ${n}`;
       target.click();
+      setTimeout(focusChatInput, REFOCUS_DELAY_MS);
     }, MENU_OPEN_DELAY_MS);
   }
 
